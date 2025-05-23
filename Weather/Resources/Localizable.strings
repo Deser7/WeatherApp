@@ -1,0 +1,20 @@
+// MARK: - Common
+"weather.forecast" = "Прогноз погоды";
+"weather.search.placeholder" = "Введите город";
+"weather.error" = "Ошибка";
+"weather.retry" = "Повторить";
+
+// MARK: - Weather Conditions
+"weather.condition.sunny" = "Солнечно";
+"weather.condition.partly_cloudy" = "Переменная облачность";
+"weather.condition.cloudy" = "Облачно";
+"weather.condition.rain" = "Дождь";
+"weather.condition.snow" = "Снег";
+"weather.condition.thunder" = "Гроза";
+"weather.condition.fog" = "Туман";
+"weather.condition.mist" = "Дымка";
+
+// MARK: - Units
+"weather.units.temperature" = "%d°C";
+"weather.units.wind" = "%d м/с";
+"weather.units.humidity" = "%d%%"; 

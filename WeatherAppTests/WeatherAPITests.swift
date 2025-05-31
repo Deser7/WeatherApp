@@ -48,7 +48,7 @@ final class WeatherAPITests: XCTestCase {
             _ = try await weatherService.fetchWeatherForecast(for: city)
             XCTFail("Expected error for invalid city")
         } catch {
-            XCTAssertTrue(error is URLError)
+            XCTAssertTrue(error is WeatherError)
         }
     }
     
@@ -61,7 +61,7 @@ final class WeatherAPITests: XCTestCase {
             _ = try await weatherService.fetchWeatherForecast(for: city)
             XCTFail("Expected error for empty city")
         } catch {
-            XCTAssertTrue(error is URLError)
+            XCTAssertTrue(error is WeatherError)
         }
     }
     

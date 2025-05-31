@@ -4,6 +4,7 @@ import SwiftUI
 struct WeatherDayCell: View {
     // MARK: - Properties
     let forecastDay: ForecastDay
+    @State private var weatherImage: UIImage?
     
     // MARK: - Body
     var body: some View {
@@ -12,14 +13,15 @@ struct WeatherDayCell: View {
                 .font(.headline)
             
             HStack {
-                AsyncImage(url: URL(string: "https:\(forecastDay.day.condition.icon)")) { image in
-                    image
+                if let image = weatherImage {
+                    Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                } placeholder: {
+                        .frame(width: 50, height: 50)
+                } else {
                     ProgressView()
+                        .frame(width: 50, height: 50)
                 }
-                .frame(width: 50, height: 50)
                 
                 VStack(alignment: .leading) {
                     Text(forecastDay.day.condition.text)
@@ -47,9 +49,28 @@ struct WeatherDayCell: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
         .shadow(radius: 2)
+        .task {
+            await loadWeatherImage()
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func loadWeatherImage() async {
+        guard let url = URL(string: "https:\(forecastDay.day.condition.icon)") else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let image = UIImage(data: data) {
+                await MainActor.run {
+                    weatherImage = image
+                }
+            }
+        } catch {
+            print("Error loading image: \(error)")
+        }
     }
 }
 

@@ -1,9 +1,8 @@
 import Foundation
-import Combine
 
 // MARK: - Weather Service Protocol
 protocol WeatherServiceProtocol {
-    func fetchWeatherForecast(for city: String) -> AnyPublisher<WeatherResponse, Error>
+    func fetchWeatherForecast(for city: String) async throws -> WeatherResponse
 }
 
 // MARK: - Weather Service
@@ -11,17 +10,20 @@ final class WeatherService: WeatherServiceProtocol {
     private let apiKey = "59bb56e1b5934986984113445252305"
     private let baseURL = "https://api.weatherapi.com/v1"
     
-    func fetchWeatherForecast(for city: String) -> AnyPublisher<WeatherResponse, Error> {
+    func fetchWeatherForecast(for city: String) async throws -> WeatherResponse {
         let urlString = "\(baseURL)/forecast.json?q=\(city)&days=5&key=\(apiKey)"
         
         guard let url = URL(string: urlString) else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
         
-        return URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: WeatherResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        return try JSONDecoder().decode(WeatherResponse.self, from: data)
     }
 } 

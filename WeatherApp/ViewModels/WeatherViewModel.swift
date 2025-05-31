@@ -1,7 +1,7 @@
 import Foundation
-import Combine
 
 // MARK: - Weather View Model
+@MainActor
 final class WeatherViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var forecastDays: [ForecastDay] = []
@@ -10,7 +10,6 @@ final class WeatherViewModel: ObservableObject {
     
     // MARK: - Private Properties
     private let weatherService: WeatherServiceProtocol
-    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization
     init(weatherService: WeatherServiceProtocol = WeatherService()) {
@@ -19,18 +18,23 @@ final class WeatherViewModel: ObservableObject {
     
     // MARK: - Public Methods
     func fetchWeather(for city: String) {
+        Task {
+            await fetchWeatherData(for: city)
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func fetchWeatherData(for city: String) async {
         isLoading = true
         error = nil
         
-        weatherService.fetchWeatherForecast(for: city)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] response in
-                self?.forecastDays = response.forecast.forecastday
-            }
-            .store(in: &cancellables)
+        do {
+            let response = try await weatherService.fetchWeatherForecast(for: city)
+            forecastDays = response.forecast.forecastday
+        } catch {
+            self.error = error.localizedDescription
+        }
+        
+        isLoading = false
     }
 } 

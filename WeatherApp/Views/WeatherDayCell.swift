@@ -69,7 +69,7 @@ struct WeatherDayCell: View {
                 }
             }
         } catch {
-            print("Error loading image: \(error)")
+            print("Error loading image.")
         }
     }
 }

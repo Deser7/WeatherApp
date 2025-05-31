@@ -29,7 +29,7 @@ final class WeatherViewModel: ObservableObject {
         
         // Проверяем, что город не пустой
         guard !city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            error = "Название города не может быть пустым"
+            error = "City name cannot be empty."
             isLoading = false
             return
         }

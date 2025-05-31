@@ -1,5 +1,25 @@
 import Foundation
 
+// MARK: - Weather Error
+enum WeatherError: LocalizedError {
+    case invalidCity
+    case networkError
+    case invalidResponse
+    case decodingError
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidCity:
+            return "Incorrect city name"
+        case .networkError:
+            return "Network error. Check your internet connection."
+        case .invalidResponse:
+            return "Incorrect response from the server."
+        case .decodingError:
+            return "Data processing error."
+        }
+    }
+} 
 // MARK: - Weather Service Protocol
 protocol WeatherServiceProtocol {
     func fetchWeatherForecast(for city: String) async throws -> WeatherResponse
